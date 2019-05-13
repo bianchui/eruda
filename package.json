@@ -16,11 +16,6 @@
     "genIcon": "node script/genIcon",
     "genUtilDoc": "eustia doc src/lib/util.js -f md -o doc/UTIL_API.md -t \"Eruda Util Documentation\""
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run ci"
-    }
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/liriliri/eruda.git"

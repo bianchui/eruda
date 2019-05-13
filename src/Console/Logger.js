@@ -5,7 +5,7 @@ import {
   isNum,
   isUndef,
   perfNow,
-  startWith,
+  //startWith,
   escapeRegExp,
   isStr,
   extend,
@@ -13,7 +13,7 @@ import {
   isRegExp,
   isFn,
   stripHtmlTag,
-  loadJs,
+  //loadJs,
   $
 } from '../lib/util'
 
@@ -135,6 +135,8 @@ export default class Logger extends Emitter {
     return this.insert('warn', args)
   }
   input(jsCode) {
+    this.filter(new RegExp(escapeRegExp(jsCode)))
+    /*
     if (startWith(jsCode, ':')) {
       this._runCmd(jsCode.slice(1))
 
@@ -158,6 +160,7 @@ export default class Logger extends Emitter {
         args: [e]
       })
     }
+    */
 
     return this
   }
@@ -171,6 +174,7 @@ export default class Logger extends Emitter {
   html(...args) {
     return this.insert('html', args)
   }
+  /*
   help() {
     return this.insert({
       type: 'html',
@@ -178,6 +182,7 @@ export default class Logger extends Emitter {
       ignoreFilter: true
     })
   }
+  */
   render() {
     let html = '',
       logs = this._logs
@@ -282,6 +287,7 @@ export default class Logger extends Emitter {
 
     return log.type === filter
   }
+  /*
   _loadJs(name) {
     loadJs(libraries[name], result => {
       if (result) return this.log(`${name} is loaded`)
@@ -299,6 +305,7 @@ export default class Logger extends Emitter {
         this.warn('Unknown command').help()
     }
   }
+  */
   _bindEvent() {
     let self = this
 
@@ -320,6 +327,7 @@ export default class Logger extends Emitter {
   }
 }
 
+/*
 let cmdList = require('./cmdList.json'),
   helpMsg = require('./help.hbs')({ commands: cmdList }),
   libraries = require('./libraries.json')
@@ -335,3 +343,4 @@ let evalJs = jsInput => {
 
   return ret
 }
+*/
