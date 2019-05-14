@@ -1,16 +1,18 @@
-import Tool from '../DevTools/Tool'
+//import Tool from '../DevTools/Tool'
 import {
-  evalCss,
-  $,
-  LocalStore,
-  uniqId,
-  each,
-  filter,
-  isStr,
-  clone
+  //evalCss,
+  //$,
+  Store,
+  //LocalStore,
+  //uniqId,
+  //each,
+  //filter,
+  //isStr,
+  //clone
 } from '../lib/util'
 
-export default class Settings extends Tool {
+export default class Settings /*extends Tool*/ {
+  /*
   constructor() {
     super()
 
@@ -71,7 +73,7 @@ export default class Settings extends Tool {
         val: config.get(key)
       })
     )
-
+    
     return this
   }
   color(
@@ -171,6 +173,8 @@ export default class Settings extends Tool {
 
     return ret
   }
+  */
+  /*
   _bindEvent() {
     let self = this
 
@@ -266,9 +270,11 @@ export default class Settings extends Tool {
         setting.config.set(setting.key, val)
       })
   }
+  */
   static createCfg(name, data) {
-    return new LocalStore('eruda-' + name, data)
+    //return new LocalStore('eruda-' + name, data)
+    return new Store(data)
   }
 }
 
-let progress = (val, min, max) => (((val - min) / (max - min)) * 100).toFixed(2)
+//let progress = (val, min, max) => (((val - min) / (max - min)) * 100).toFixed(2)

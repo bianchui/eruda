@@ -132,7 +132,7 @@ export default class DevTools extends Emitter {
 
     return this
   }
-  initCfg(settings) {
+  initCfg(/*settings*/) {
     let cfg = (this.config = Settings.createCfg('dev-tools', {
       transparency: 0.95,
       displaySize: 80,
@@ -161,6 +161,7 @@ export default class DevTools extends Emitter {
       }
     })
 
+    /*
     settings
       .separator()
       .switch(cfg, 'activeEruda', 'Always Activated')
@@ -177,6 +178,7 @@ export default class DevTools extends Emitter {
         step: 1
       })
       .separator()
+    */
   }
   setNavBarHeight(height) {
     this._navBarHeight = height

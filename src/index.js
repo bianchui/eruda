@@ -1,4 +1,4 @@
-import EntryBtn from './EntryBtn/EntryBtn'
+//import EntryBtn from './EntryBtn/EntryBtn'
 import DevTools from './DevTools/DevTools'
 import Tool from './DevTools/Tool'
 import Console from './Console/Console'
@@ -9,8 +9,8 @@ import Snippets from './Snippets/Snippets'
 import Resources from './Resources/Resources'
 import Info from './Info/Info'
 import Sources from './Sources/Sources'
-*/
 import Settings from './Settings/Settings'
+*/
 import emitter from './lib/emitter'
 import config from './lib/config'
 import logger from './lib/logger'
@@ -20,7 +20,7 @@ import {
   isFn,
   evalCss,
   isNum,
-  isObj,
+  //isObj,
   isMobile,
   viewportScale,
   detectBrowser,
@@ -28,7 +28,7 @@ import {
   toArr,
   upperFirst,
   nextTick,
-  last
+  //last
 } from './lib/util'
 
 module.exports = {
@@ -39,7 +39,7 @@ module.exports = {
     this._initContainer(container, useShadowDom)
     this._initStyle()
     this._initDevTools()
-    this._initEntryBtn()
+    //this._initEntryBtn()
     this._initSettings()
     this._initTools(tool)
     this._registerListener()
@@ -64,7 +64,7 @@ module.exports = {
   get(name) {
     if (!this._checkInit()) return
 
-    if (name === 'entryBtn') return this._entryBtn
+    //if (name === 'entryBtn') return this._entryBtn
 
     let devTools = this._devTools
 
@@ -103,8 +103,8 @@ module.exports = {
   destroy() {
     this._devTools.destroy()
     delete this._devTools
-    this._entryBtn.destroy()
-    delete this._entryBtn
+    //this._entryBtn.destroy()
+    //delete this._entryBtn
     this._unregisterListener()
     this._$el.remove()
     evalCss.clear()
@@ -118,6 +118,7 @@ module.exports = {
 
     return this._scale
   },
+  /*
   position(p) {
     const entryBtn = this._entryBtn
 
@@ -128,6 +129,7 @@ module.exports = {
 
     return entryBtn.getPos()
   },
+  */
   _autoScale() {
     if (!isMobile()) return
 
@@ -206,18 +208,20 @@ module.exports = {
         require('./style/icon.css')
     )
   },
+  /*
   _initEntryBtn() {
     this._entryBtn = new EntryBtn(this._$el)
     this._entryBtn.on('click', () => this._devTools.toggle())
   },
+  */
   _initSettings() {
     let devTools = this._devTools
-    let settings = new Settings()
+    //let settings = new Settings()
 
-    devTools.add(settings)
+    //devTools.add(settings)
 
-    this._entryBtn.initCfg(settings)
-    devTools.initCfg(settings)
+    //this._entryBtn.initCfg(settings)
+    devTools.initCfg(/*settings*/)
   },
   _initTools(
     tool = [
@@ -251,7 +255,8 @@ module.exports = {
       }
     })
 
-    devTools.showTool(last(tool) || 'settings')
+    //devTools.showTool(last(tool) || 'settings')
+    devTools.showTool('console')
   }
 }
 

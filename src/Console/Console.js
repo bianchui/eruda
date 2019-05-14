@@ -282,6 +282,7 @@ export default class Console extends Tool {
       }
     })
 
+    /*
     let settings = container.get('settings')
 
     settings
@@ -309,6 +310,7 @@ export default class Console extends Tool {
         '10'
       ])
       .separator()
+    */
   }
 }
 
