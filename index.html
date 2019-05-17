@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+
+<script src="eruda.js"></script>
+<script>
+eruda.init();
+//const consoles = erudaWxConsole(eruda)  
+//
+//eruda.get().config.set({
+//  displaySize: 100,
+//  transparency: 1,
+//  tinyNavBar: true,
+//  navBarBgColor: '#00b26a'
+//})
+eruda.get().config.set({
+  displaySize: 100,
+  transparency: 1,
+  tinyNavBar: true,
+  navBarBgColor: '#006ab2'
+});
+//eruda.remove('settings');
+eruda.show();
+//eruda._entryBtn.destroy()
+
+function init() {
+  let console = eruda.get('console');
+  console.log('eruda is a console for %s.', 'mobile browsers');
+  console.table([{test: 1}, {test: 2}, {test2: 3}], 'test');
+  console.error(new Error('eruda'));
+  console.log({
+      a:100,
+      b: 1000,
+      c: 10000
+  })
+  console.on('log', function () 
+  {
+      // Do whatever you want, send to server or save on local storage.
+  });
+}
+init();
+
+console.log("asdfasdfasdfasdf", "asdfasdfasdf", {a: 1}, {a: 12});
+console.log("1");
+console.log("3");
+console.log("asdfasdfasdfasdf");
+console.log("4");
+console.log("5");
+console.log("asdfasdfasdfasdf");
+console.log("6");
+
+function testError() {
+  var e = new Error('abc');
+  console.log( typeof(e))
+  console.error(e, "asdf", "wewer");
+  e.stack = 'Error: abc\n'+
+'    at hacked (file:///dongdong/index.html:53:11)\n'+
+'    at file:///dongdong/index.html:59:1';
+  console.error(e);
+}
+
+testError();
+
+</script>
+
+</body>
+</html>
+
+
