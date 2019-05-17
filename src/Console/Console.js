@@ -3,7 +3,7 @@ import Tool from '../DevTools/Tool'
 import { noop, evalCss, $, Emitter } from '../lib/util'
 import emitter from '../lib/emitter'
 import Settings from '../Settings/Settings'
-import stringify from './stringify'
+//import stringify from './stringify'
 import libStringify from '../lib/stringify'
 
 export default class Console extends Tool {
@@ -143,7 +143,10 @@ export default class Console extends Tool {
 
           return this
         })
-    )
+    );
+    this.insert = (args) => {
+      logger.insert(args);
+    };
   }
   _bindEvent() {
     let container = this._container
@@ -243,14 +246,14 @@ export default class Console extends Tool {
       maxLogNum: 'infinite'
     }))
 
-    let isWorkerSupported = !!window.Worker
+    //let isWorkerSupported = !!window.Worker
 
     let maxLogNum = cfg.get('maxLogNum')
     maxLogNum = maxLogNum === 'infinite' ? maxLogNum : +maxLogNum
 
     if (cfg.get('catchGlobalErr')) this.catchGlobalErr()
     if (cfg.get('overrideConsole')) this.overrideConsole()
-    if (cfg.get('useWorker') && isWorkerSupported) stringify.useWorker = true
+    //if (cfg.get('useWorker') && isWorkerSupported) stringify.useWorker = true
     logger.displayHeader(cfg.get('displayExtraInfo'))
     logger.displayUnenumerable(cfg.get('displayUnenumerable'))
     logger.displayGetterVal(cfg.get('displayGetterVal'))
@@ -276,9 +279,9 @@ export default class Console extends Tool {
           return logger.lazyEvaluation(val)
         case 'viewLogInSources':
           return logger.viewLogInSources(val)
-        case 'useWorker':
-          stringify.useWorker = val
-          return
+        //case 'useWorker':
+        //  stringify.useWorker = val
+        //  return
       }
     })
 

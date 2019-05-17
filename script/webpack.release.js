@@ -7,9 +7,18 @@ exports.devtool = false
 exports.plugins = exports.plugins.concat([
   new webpack.optimize.UglifyJsPlugin({
     compress: {
+      dead_code: true,
+      pure_getters: true,
       warnings: false
     },
+    mangle: {
+      properties: {
+        regex: /_$|^_|\$$/,
+        reserved: [],
+      },
+    },
     output: {
+      comments: false,
       ascii_only: true
     },
     comments: /eruda v/

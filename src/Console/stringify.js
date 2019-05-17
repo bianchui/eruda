@@ -1,29 +1,30 @@
 import stringify from '../lib/stringify'
-import StringifyWorker from '../lib/stringifyWorker'
-import { nextTick, uniqId, tryIt } from '../lib/util'
+//import StringifyWorker from '../lib/stringifyWorker'
+import { nextTick/*, uniqId, tryIt */} from '../lib/util'
 
-let isWorkerSupported = !!window.Worker
-
-let callbacks = {},
-  worker
-
-if (isWorkerSupported) {
-  tryIt(function() {
-    /* Some browsers like uc mobile doesn't destroy worker properly after refreshing.
-     * After a few times of visiting, it reaches the maximum number of workers per site. 
-     */
-    worker = new StringifyWorker()
-    worker.onmessage = function(e) {
-      let [id, result] = e.data
-      if (callbacks[id]) {
-        callbacks[id](result)
-        delete callbacks[id]
-      }
-    }
-  })
-}
+//let isWorkerSupported = !!window.Worker
+//
+//let callbacks = {},
+//  worker
+//
+//if (isWorkerSupported) {
+//  tryIt(function() {
+//    /* Some browsers like uc mobile doesn't destroy worker properly after refreshing.
+//     * After a few times of visiting, it reaches the maximum number of workers per site. 
+//     */
+//    worker = new StringifyWorker()
+//    worker.onmessage = function(e) {
+//      let [id, result] = e.data
+//      if (callbacks[id]) {
+//        callbacks[id](result)
+//        delete callbacks[id]
+//      }
+//    }
+//  })
+//}
 
 function exports(obj, options, cb) {
+  /*
   let useWorker = exports.useWorker && isWorkerSupported && worker
 
   if (useWorker) {
@@ -37,11 +38,12 @@ function exports(obj, options, cb) {
       delete callbacks[id]
     }
   }
+  */
 
   let result = stringify(obj, options)
   nextTick(() => cb(result))
 }
 
-exports.useWorker = false
+//exports.useWorker = false
 
 export default exports

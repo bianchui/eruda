@@ -32,12 +32,14 @@ export default class Log {
   constructor({
     type = 'log',
     args = [],
+    stack = '',
     id,
     displayHeader = false,
     ignoreFilter = false
   }) {
     this.type = type
     this.args = args
+    this.stack = stack
     this.count = 1
     this.id = id
     this.displayHeader = displayHeader
@@ -138,6 +140,9 @@ export default class Log {
         err = args[0]
         icon = 'error'
         err = isErr(err) ? err : new Error(formatMsg(args))
+        if (this.stack) {
+          err.stack = this.stack;
+        }
         this.src = err
         msg = formatErr(err)
         break
