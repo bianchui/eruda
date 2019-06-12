@@ -26,48 +26,181 @@ eruda.get().config.set({
 });
 //eruda.remove('settings');
 eruda.show();
-//eruda._entryBtn.destroy()
 
 var con = eruda.get('console');
 
 function parse(log) {
-  log = atob(log);
-  //console.log(log);
   try {
+    log = atob(log);
     return JSON.parse(log);
   } catch (e) {
-      //window.console.warn(log);
-      //window.console.error(e)
+      window.console.warn(log);
       throw e;
   }
 }
 
 function addLog(log) {
   var obj = parse(log);
-  //console.log(obj);
-  //con.insert(obj);
-  //return;
+  con.insert(obj);
+}
+// String, Number, Boolean
+// Date, RegExp
+// Array
+// ArrayBuffer
+// Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array
+// Set, Map, WeakSet, WeakMap
+console.log(addLog);
 
-  switch (obj.type) {
-    case 'debug':
-      con.debug.apply(con, obj.args);
-      break;
-    case 'info':
-      con.info.apply(con, obj.args);
-      break;
-    case 'log':
-      con.log.apply(con, obj.args);
-      break;
-    case 'warn':
-      con.warn.apply(con, obj.args);
-      break;
-    case 'error':
-      con.insert(obj);
-      break;
-    case 'assert':
-      con.error.apply(con, obj.args);
-      break;
+var Types = {
+  TypeUndefined: 0,
+  //TypeBasic: 1,
+  TypeNull: 1,
+  TypeBoolean: 2,
+  TypeNumber: 3,
+  TypeFuncion: 4,
+  TypeString: 5,
+  TypeObject: 6,
+  TypeBigint: 7,
+  TypeSymbol: 8,
+  TypeUnknown: 9,
+};
+
+var kMaxObj = 100;
+
+function encodeValue(ctx, v) {
+  var t = typeof v;
+  switch (t) {
+    case 'undefined':
+      return { t: Types.TypeUndefined };
+    case 'boolean':
+      return { t: Types.TypeBoolean, v: v };
+    case 'number':
+      return { t: Types.TypeNumber, v: v };
+    case 'function':
+      // eval("(function() { return function 'v'() { '...' } })()");
+      return { t: Types.TypeFuncion, v: v.name };
+    case 'string':
+      // v
+      return { t: Types.TypeString, v: v };
+    case 'object':
+      if (v === null) {
+        return { t: Types.TypeNull };
+      } else {
+        return { t: Types.TypeObject, v: encodeObject(ctx, v) };
+      }
+    case 'bigint':
+      // v = BigInt(v)
+      return { t: Types.TypeBigint, v: v.toString() };
+    case 'symbol':
+      // Symbol.for(v)
+      return { t: Types.TypeSymbol, v: Symbol.keyFor(v) };
+    default:
+      return { t: Types.TypeUnknown, v: t };
   }
+};
+
+function encodeObject(ctx, obj) {
+  var id;
+  if (!ctx._objmap) {
+    ctx._objmap = new Map();
+  } else {
+    id = ctx._objmap.get(obj);
+    if (id !== undefined) {
+      return id;
+    }
+  }
+  if (!ctx.o) {
+    ctx.o = [];
+  }
+  if (ctx.o.length >= kMaxObj) {
+    return -1;
+  }
+  var o = {};
+  id = ctx.o.length;
+  ctx.o.push(o);
+  ctx._objmap.set(obj, id);
+  for (var p in obj) {
+    o[p] = encodeValue(ctx, obj[p]);
+  }
+  return id;
+};
+
+function encode() {
+  var args = [];
+  var ctx = {};
+  var argc = arguments.length;
+  for (var i = 0; i < argc; ++i) {
+    args[i] = encodeValue(ctx, arguments[i]);
+  }
+  var ret = {
+    a: args
+  };
+  if (ctx.o) {
+    ret.o = ctx.o;
+  }
+  return ret;
+}
+
+function decodeValue(ctx, v) {
+  switch (v.t) {
+    case Types.TypeUndefined:
+      return undefined;
+    case Types.TypeNull:
+      return null;
+    case Types.TypeBoolean:
+      return v.v;
+    case Types.TypeNumber:
+      return v.v;
+    case Types.TypeFuncion:
+      return eval("(function() { return function " + v.v + "() { '...' } })()");
+    case Types.TypeString:
+      return v.v;
+    case Types.TypeObject:
+      return decodeObject(v.v);
+    case Types.TypeBigint:
+      return BigInt ? BigInt(v.v) : "BigInt(" + v.v + ")";
+    case Types.TypeSymbol:
+      return Symbol ? Symbol.for(v.v) : "Symbol(" + v.v + ")";
+    case Types.TypeUnknown:
+      return v.v;
+  }
+}
+
+function decodeObject(ctx, id) {
+  if (id === -1) {
+    return {};
+  }
+  if (!ctx.o) {
+    ctx.o = [];
+  }
+  if (ctx.o.length >= kMaxObj) {
+    return -1;
+  }
+  var o = {};
+  id = ctx.o.length;
+  ctx.o.push(o);
+  ctx._objmap.set(obj, id);
+  for (var p in obj) {
+    o[p] = encodeValue(ctx, obj[p]);
+  }
+  return id;
+};
+
+function decode(args) {
+  var a = args.a;
+  var ctx = {};
+  if (args.o) {
+    var o = args.o;
+    var objs = ctx.o = [];
+    for (var i = o.length - 1; i >= 0; i--) {
+      objs[i] = decodeValue(ctx, o[i]);
+    }
+  }
+  var ret = [];
+  for (var i = a.length - 1; i >= 0; i--) {
+    ret[i] = decodeValue(ctx, a[i]);
+  }
+  return ret;
 }
 
 

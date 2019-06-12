@@ -6,7 +6,7 @@ import JsonViewer from '../lib/JsonViewer'
 import {
   isObj,
   isStr,
-  isErr,
+  //isErr,
   wrap,
   defaults,
   dateFormat,
@@ -115,7 +115,7 @@ export default class Log {
 
     let msg = ''
     let icon
-    let err
+    //let err
 
     switch (type) {
       case 'log':
@@ -136,15 +136,17 @@ export default class Log {
         msg = formatMsg(args)
         break
       case 'error':
-        if (isStr(args[0]) && args.length !== 1) args = substituteStr(args)
-        err = args[0]
+        //if (isStr(args[0]) && args.length !== 1) args = substituteStr(args)
+        //err = args[0]
         icon = 'error'
-        err = isErr(err) ? err : new Error(formatMsg(args))
+        msg = formatMsg(args)
+        //err = isErr(err) ? err : new Error(formatMsg(args))
         if (this.stack) {
-          err.stack = this.stack;
+          msg += formatStack(this.stack)
+          //err.stack = this.stack;
         }
-        this.src = err
-        msg = formatErr(err)
+        //this.src = err
+        //msg = formatErr(err)
         break
       case 'table':
         msg = formatTable(args)
@@ -172,14 +174,17 @@ export default class Log {
     this.formattedMsg = msg
   }
   static click(type, log, $el, logger) {
-    switch (type) {
-      case 'log':
-      case 'warn':
-      case 'info':
-      case 'debug':
-      case 'output':
-      case 'table':
-      case 'dir':
+    if (type === 'error') {
+      $el.find('.eruda-stack').toggleClass('eruda-hidden');
+    }
+    //switch (type) {
+    //  case 'log':
+    //  case 'warn':
+    //  case 'info':
+    //  case 'debug':
+    //  case 'output':
+    //  case 'table':
+    //  case 'dir':
         if (log.src) {
           if (Log.showSrcInSources) {
             return logger.emit('viewJson', log.src)
@@ -200,11 +205,11 @@ export default class Log {
             delete log.args
           })
         }
-        break
-      case 'error':
-        $el.find('.eruda-stack').toggleClass('eruda-hidden')
-        break
-    }
+    //    break;
+    //  case 'error':
+    //    $el.find('.eruda-stack').toggleClass('eruda-hidden');
+    //    break;
+    //}
 
     return 'handled'
   }
@@ -272,6 +277,7 @@ function formatTable(args) {
 let regJsUrl = /https?:\/\/([0-9.\-A-Za-z]+)(?::(\d+))?\/[A-Z.a-z0-9/]*\.js/g
 let regErudaJs = /eruda(\.min)?\.js/
 
+/*
 function formatErr(err) {
   let lines = err.stack ? err.stack.split('\n') : []
   let msg = `${err.message || lines[0]}<br/>`
@@ -284,6 +290,23 @@ function formatErr(err) {
 
   return (
     msg +
+    stack.replace(
+      regJsUrl,
+      match => `<a href="${match}" target="_blank">${match}</a>`
+    )
+  )
+}
+*/
+function formatStack(err_stack) {
+  let lines = err_stack ? err_stack.split('\n') : []
+
+  lines = lines.filter(val => !regErudaJs.test(val)).map(val => escape(val))
+
+  let stack = `<div class="eruda-stack eruda-hidden">${lines
+    //.slice(1)
+    .join('<br/>')}</div>`
+
+  return (
     stack.replace(
       regJsUrl,
       match => `<a href="${match}" target="_blank">${match}</a>`
