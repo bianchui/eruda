@@ -17,7 +17,7 @@ let postcssLoader = {
 }
 
 module.exports = {
-  entry: './src/myindex',
+  entry: './src/index',
   devServer: {
     contentBase: './test',
     port: 3000
@@ -25,7 +25,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, '../'),
     publicPath: '/assets/',
-    library: ['addLog'],
+    library: ['eruda'],
     libraryTarget: 'var'
   },
   module: {

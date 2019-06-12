@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>JsConsole</title>
 </head>
 <body>
 
@@ -26,43 +28,48 @@ eruda.get().config.set({
 eruda.show();
 //eruda._entryBtn.destroy()
 
-function init() {
-  let console = eruda.get('console');
-  console.log('eruda is a console for %s.', 'mobile browsers');
-  console.table([{test: 1}, {test: 2}, {test2: 3}], 'test');
-  console.error(new Error('eruda'));
-  console.log({
-      a:100,
-      b: 1000,
-      c: 10000
-  })
-  console.on('log', function () 
-  {
-      // Do whatever you want, send to server or save on local storage.
-  });
-}
-init();
+var con = eruda.get('console');
 
-console.log("asdfasdfasdfasdf", "asdfasdfasdf", {a: 1}, {a: 12});
-console.log("1");
-console.log("3");
-console.log("asdfasdfasdfasdf");
-console.log("4");
-console.log("5");
-console.log("asdfasdfasdfasdf");
-console.log("6");
-
-function testError() {
-  var e = new Error('abc');
-  console.log( typeof(e))
-  console.error(e, "asdf", "wewer");
-  e.stack = 'Error: abc\n'+
-'    at hacked (file:///dongdong/index.html:53:11)\n'+
-'    at file:///dongdong/index.html:59:1';
-  console.error(e);
+function parse(log) {
+  log = atob(log);
+  //console.log(log);
+  try {
+    return JSON.parse(log);
+  } catch (e) {
+      //window.console.warn(log);
+      //window.console.error(e)
+      throw e;
+  }
 }
 
-testError();
+function addLog(log) {
+  var obj = parse(log);
+  //console.log(obj);
+  //con.insert(obj);
+  //return;
+
+  switch (obj.type) {
+    case 'debug':
+      con.debug.apply(con, obj.args);
+      break;
+    case 'info':
+      con.info.apply(con, obj.args);
+      break;
+    case 'log':
+      con.log.apply(con, obj.args);
+      break;
+    case 'warn':
+      con.warn.apply(con, obj.args);
+      break;
+    case 'error':
+      con.insert(obj);
+      break;
+    case 'assert':
+      con.error.apply(con, obj.args);
+      break;
+  }
+}
+
 
 </script>
 

@@ -11,9 +11,21 @@ eruda.show();
 var con = eruda.get('console');
 
 function parse(log) {
-  return JSON.parse(log);
+  try {
+    log = atob(log);
+    return JSON.parse(log);
+  } catch (e) {
+    window.console.warn(log);
+    throw e;
+  }
 }
 
+function addLog(log) {
+  var obj = parse(log);
+  con.insert(obj);
+}
+
+/*
 function addLog(log) {
   var obj = parse(log);
 
@@ -38,5 +50,6 @@ function addLog(log) {
       break;
   }
 }
+*/
 
 module.exports = addLog;
