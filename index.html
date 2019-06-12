@@ -156,7 +156,11 @@ function decodeValue(ctx, v) {
     case Types.TypeString:
       return v.v;
     case Types.TypeObject:
-      return decodeObject(v.v);
+      if (v.v === -1) {
+        return {};
+      }
+      console.assert(ctx.o[v.v]);
+      return ctx.o[v.v];
     case Types.TypeBigint:
       return BigInt ? BigInt(v.v) : "BigInt(" + v.v + ")";
     case Types.TypeSymbol:
@@ -166,24 +170,13 @@ function decodeValue(ctx, v) {
   }
 }
 
-function decodeObject(ctx, id) {
-  if (id === -1) {
-    return {};
-  }
-  if (!ctx.o) {
-    ctx.o = [];
-  }
-  if (ctx.o.length >= kMaxObj) {
-    return -1;
-  }
+function decodeObject(ctx, i, obj) {
   var o = {};
-  id = ctx.o.length;
-  ctx.o.push(o);
-  ctx._objmap.set(obj, id);
+  ctx.o[i] = o;
   for (var p in obj) {
-    o[p] = encodeValue(ctx, obj[p]);
+    o[p] = decodeValue(ctx, obj[p]);
   }
-  return id;
+  return o;
 };
 
 function decode(args) {
@@ -191,9 +184,9 @@ function decode(args) {
   var ctx = {};
   if (args.o) {
     var o = args.o;
-    var objs = ctx.o = [];
+    ctx.o = [];
     for (var i = o.length - 1; i >= 0; i--) {
-      objs[i] = decodeValue(ctx, o[i]);
+      decodeObject(ctx, i, o[i]);
     }
   }
   var ret = [];
