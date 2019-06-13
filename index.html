@@ -51,51 +51,47 @@ function addLog(log) {
 // Set, Map, WeakSet, WeakMap
 console.log(addLog);
 
-var Types = {
-  TypeUndefined: 0,
-  //TypeBasic: 1,
-  TypeNull: 1,
-  TypeBoolean: 2,
-  TypeNumber: 3,
-  TypeFuncion: 4,
-  TypeString: 5,
-  TypeObject: 6,
-  TypeBigint: 7,
-  TypeSymbol: 8,
-  TypeUnknown: 9,
+const TypeIds = {
+  Undefined: 0,
+  Null: 1,
+  Boolean: 2,
+  Number: 3,
+  Funcion: 4,
+  String: 5,
+  Object: 6,
+  Bigint: 7,
+  Symbol: 8,
+  Unknown: 9,
 };
 
-var kMaxObj = 100;
+const kMaxObj = 100;
 
 function encodeValue(ctx, v) {
   var t = typeof v;
   switch (t) {
     case 'undefined':
-      return { t: Types.TypeUndefined };
+      return { t: TypeIds.Undefined };
     case 'boolean':
-      return { t: Types.TypeBoolean, v: v };
     case 'number':
-      return { t: Types.TypeNumber, v: v };
+    case 'string':
+      return v;
     case 'function':
       // eval("(function() { return function 'v'() { '...' } })()");
-      return { t: Types.TypeFuncion, v: v.name };
-    case 'string':
-      // v
-      return { t: Types.TypeString, v: v };
+      return { t: TypeIds.Funcion, v: v.name };
     case 'object':
       if (v === null) {
-        return { t: Types.TypeNull };
+        return v;
       } else {
-        return { t: Types.TypeObject, v: encodeObject(ctx, v) };
+        return { t: TypeIds.Object, v: encodeObject(ctx, v) };
       }
     case 'bigint':
       // v = BigInt(v)
-      return { t: Types.TypeBigint, v: v.toString() };
+      return { t: TypeIds.Bigint, v: v.toString() };
     case 'symbol':
       // Symbol.for(v)
-      return { t: Types.TypeSymbol, v: Symbol.keyFor(v) };
+      return { t: TypeIds.Symbol, v: Symbol.keyFor(v) };
     default:
-      return { t: Types.TypeUnknown, v: t };
+      return { t: TypeIds.Unknown, v: t };
   }
 };
 
@@ -142,19 +138,26 @@ function encode() {
 }
 
 function decodeValue(ctx, v) {
+  if (v === null) {
+    return null;
+  }
+  var t = typeof v;
+  if (t !== 'object') {
+    return v;
+  }
   switch (v.t) {
     case Types.TypeUndefined:
       return undefined;
     case Types.TypeNull:
       return null;
-    case Types.TypeBoolean:
-      return v.v;
-    case Types.TypeNumber:
-      return v.v;
+    //case Types.TypeBoolean:
+    //  return v.v;
+    //case Types.TypeNumber:
+    //  return v.v;
     case Types.TypeFuncion:
       return eval("(function() { return function " + v.v + "() { '...' } })()");
-    case Types.TypeString:
-      return v.v;
+    //case Types.TypeString:
+    //  return v.v;
     case Types.TypeObject:
       if (v.v === -1) {
         return {};

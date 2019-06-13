@@ -23,11 +23,11 @@ exports.plugins = exports.plugins.concat([
       comments: false,
       ascii_only: true
     },
-    comments: /eruda v/
+    //comments: /eruda v/
   }),
   new webpack.DefinePlugin({
     ENV: '"production"'
-  })
+  }),
 ])
 
 module.exports = exports
