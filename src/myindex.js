@@ -1,4 +1,5 @@
 import eruda from './index'
+import { Base64 } from 'js-base64';
 
 eruda.init();
 eruda.get().config.set({
@@ -46,7 +47,7 @@ function decodeValue(ctx, v) {
     //  return v.v;
     case TypeIds.Object:
       if (v.v === -1) {
-        return {};
+        return {'...': '...'};
       }
       //console.assert(ctx.o[v.v]);
       return ctx.o[v.v];
@@ -69,6 +70,9 @@ function decodeObject(ctx, i, obj) {
 }
 
 function decode(args) {
+  if (Array.isArray(args)) {
+    return args;
+  }
   const a = args.a;
   const ctx = {};
   if (args.o) {
@@ -88,7 +92,7 @@ function decode(args) {
 
 function parse(log) {
   try {
-    log = atob(log);
+    log = Base64.decode(log);
     return JSON.parse(log);
   } catch (e) {
     window.console.warn(log);

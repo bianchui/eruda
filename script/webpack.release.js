@@ -4,7 +4,7 @@ exports = require('./webpack.base')
 
 exports.entry = './src/myindex';
 exports.output.library = ['addLog'];
-exports.output.filename = 'eruda.min.js'
+exports.output.filename = 'out/eruda.min.js'
 exports.devtool = false
 exports.plugins = exports.plugins.concat([
   new webpack.optimize.UglifyJsPlugin({

@@ -8,6 +8,8 @@
 <body>
 
 <script src="eruda.js"></script>
+<script src="out/base64.min.js"></script>
+
 <script>
 eruda.init();
 //const consoles = erudaWxConsole(eruda)  
@@ -146,29 +148,29 @@ function decodeValue(ctx, v) {
     return v;
   }
   switch (v.t) {
-    case Types.TypeUndefined:
+    case TypeIds.Undefined:
       return undefined;
-    case Types.TypeNull:
-      return null;
-    //case Types.TypeBoolean:
+    //case TypeIds.Null:
+    //  return null;
+    //case TypeIds.Boolean:
     //  return v.v;
-    //case Types.TypeNumber:
+    //case TypeIds.Number:
     //  return v.v;
-    case Types.TypeFuncion:
-      return eval("(function() { return function " + v.v + "() { '...' } })()");
-    //case Types.TypeString:
+    case TypeIds.Funcion:
+      return eval('(function() { return function ' + v.v + '() { "..." } })()');
+    //case TypeIds.String:
     //  return v.v;
-    case Types.TypeObject:
+    case TypeIds.Object:
       if (v.v === -1) {
         return {};
       }
-      console.assert(ctx.o[v.v]);
+      //console.assert(ctx.o[v.v]);
       return ctx.o[v.v];
-    case Types.TypeBigint:
-      return BigInt ? BigInt(v.v) : "BigInt(" + v.v + ")";
-    case Types.TypeSymbol:
-      return Symbol ? Symbol.for(v.v) : "Symbol(" + v.v + ")";
-    case Types.TypeUnknown:
+    case TypeIds.Bigint:
+      return /*BigInt ? BigInt(v.v) : */'BigInt(' + v.v + ')';
+    case TypeIds.Symbol:
+      return Symbol ? Symbol.for(v.v) : 'Symbol(' + v.v + ')';
+    case TypeIds.Unknown:
       return v.v;
   }
 }
@@ -180,20 +182,20 @@ function decodeObject(ctx, i, obj) {
     o[p] = decodeValue(ctx, obj[p]);
   }
   return o;
-};
+}
 
 function decode(args) {
-  var a = args.a;
-  var ctx = {};
+  const a = args.a;
+  const ctx = {};
   if (args.o) {
     var o = args.o;
     ctx.o = [];
-    for (var i = o.length - 1; i >= 0; i--) {
+    for (let i = o.length - 1; i >= 0; i--) {
       decodeObject(ctx, i, o[i]);
     }
   }
-  var ret = [];
-  for (var i = a.length - 1; i >= 0; i--) {
+  const ret = [];
+  for (let i = a.length - 1; i >= 0; i--) {
     ret[i] = decodeValue(ctx, a[i]);
   }
   return ret;
