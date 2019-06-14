@@ -1,21 +1,51 @@
 // String, Number, Boolean
-// Date, RegExp
+// Date, RegExp, Error
 // Array
 // ArrayBuffer
-// Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array
+// Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, DataView
 // Set, Map, WeakSet, WeakMap
 
 export const TypeIds = {
+  Unknown: -1,
   Undefined: 0,
   Null: 1,
-  Boolean: 2,
-  Number: 3,
+  //Boolean: 2,
+  //Number: 3,
   Funcion: 4,
-  String: 5,
+  //String: 5,
   Object: 6,
   Bigint: 7,
   Symbol: 8,
-  Unknown: 9,
+};
+
+export const ObjIds = {
+  Boolean: 1,
+  Number: 2,
+  String: 3,
+  Date: 4,
+  RegExp: 5,
+
+  Array: 10,
+  Set: 11,
+  Map: 12,
+  WeakSet: 13,
+  WeakMap: 14,
+
+  Error: 20,
+
+  ArrayBuffer: 30,
+
+  Int8Array: 31,
+  Uint8Array: 32,
+  Uint8ClampedArray: 33,
+  Int16Array: 34,
+  Uint16Array: 35,
+  Int32Array: 36,
+  Uint32Array: 37,
+  Float32Array: 38,
+  Float64Array: 39,
+
+  DataView: 40,
 };
 
 function decodeValue(ctx, v) {
@@ -43,7 +73,6 @@ function decodeValue(ctx, v) {
       if (v.v === -1) {
         return {'...': '...'};
       }
-      //console.assert(ctx.o[v.v]);
       return ctx.o[v.v];
     case TypeIds.Bigint:
       return /*BigInt ? BigInt(v.v) : */'BigInt(' + v.v + ')';
@@ -55,10 +84,79 @@ function decodeValue(ctx, v) {
 }
 
 function decodeObject(ctx, i, obj) {
-  var o = {};
+  var o;
+  switch (obj.t) {
+    case ObjIds.Boolean:
+      o = new Boolean(obj.k);
+      break;
+    case ObjIds.Number:
+      o = new Number(obj.k);
+      break;
+    case ObjIds.String:
+      o = new String(obj.k);
+      break;
+    case ObjIds.Date:
+      o = new Date(obj.k);
+      break;
+    case ObjIds.RegExp:
+      o = RegExp ? new RegExp(obj.k) : 'RegExp(' + obj.k + ')';
+
+    case ObjIds.Array:
+      o = [];
+      break;
+
+    case ObjIds.Set:
+      o = new Set();
+      break;
+    case ObjIds.Map:
+      o = new Map();
+      break;
+    case ObjIds.WeakSet:
+      o = new WeakSet();
+      break;
+    case ObjIds.WeakMap:
+      o = new WeakMap();
+      break;
+
+    case ObjIds.Error:
+      o = obj.s;
+      break;
+
+    case ObjIds.ArrayBuffer:
+      o = new ArrayBuffer(1);
+      break;
+    case ObjIds.Int8Array:
+      break;
+    case ObjIds.Uint8Array:
+      break;
+    case ObjIds.Uint8ClampedArray:
+      break;
+    case ObjIds.Int16Array:
+      break;
+    case ObjIds.Uint16Array:
+      break;
+    case ObjIds.Int32Array:
+      break;
+    case ObjIds.Uint32Array:
+      break;
+    case ObjIds.Float32Array:
+      break;
+    case ObjIds.Float64Array:
+      break;
+    case ObjIds.DataView:
+      break;
+
+    default:
+      o = {};
+      break;
+  }
   ctx.o[i] = o;
-  for (var p in obj) {
-    o[p] = decodeValue(ctx, obj[p]);
+  if (typeof o !== 'object') {
+    return o;
+  }
+  var v = obj.v;
+  for (var p in v) {
+    o[p] = decodeValue(ctx, v[p]);
   }
   return o;
 }

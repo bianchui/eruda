@@ -2,6 +2,8 @@
 import {
   escape,
   toStr,
+  isDate,
+  isErr,
   contain,
   startWith,
   escapeJsonStr,
@@ -118,6 +120,10 @@ export default function getAbstract(
     } else {
       json = `Array(${obj.length})`
     }
+  } else if (isDate(obj)) {
+    json = obj.toString();
+  } else if (isErr(obj)) {
+    json = obj.toString();
   } else if (isObj) {
     if (canBeProto(obj)) {
       obj = Object.getPrototypeOf(obj)
