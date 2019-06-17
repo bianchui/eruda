@@ -10,16 +10,14 @@
 <script src="eruda.js"></script>
 <script src="node_modules/js-base64/base64.min.js"></script>
 
+<pre id="log_area">
+</pre>
+
 <script type="module">
+var log_area = document.getElementById("log_area");
+log_area.innerText += `${Date.now()}\n`
+
 eruda.init();
-//const consoles = erudaWxConsole(eruda)  
-//
-//eruda.get().config.set({
-//  displaySize: 100,
-//  transparency: 1,
-//  tinyNavBar: true,
-//  navBarBgColor: '#00b26a'
-//})
 eruda.get().config.set({
   displaySize: 100,
   transparency: 1,
@@ -28,8 +26,10 @@ eruda.get().config.set({
 });
 //eruda.remove('settings');
 eruda.show();
+log_area.innerText += `${Date.now()}\n`
 
 var con = eruda.get('console');
+
 
 import { decode } from './src/decoder.js'
 import { encode } from './src/encoder.js'
@@ -67,25 +67,138 @@ const log = {
     addLog(buf);
   },
   debug: function () {
+    console.debug.apply(console, arguments);
     this.send('debug', arguments);
   },
   info: function debug() {
+    console.info.apply(console, arguments);
     this.send('info', arguments);
   },
   log: function log() {
+    console.log.apply(console, arguments);
     this.send('log', arguments);
   },
   warn: function () {
+    console.warn.apply(console, arguments);
     this.send('warn', arguments);
   },
   error: function () {
+    console.error.apply(console, arguments);
     this.send('error', arguments, (new Error("")).stack);
   },
 };
 
+log.debug("哈哈哈哈", {});
+log.info("哈哈哈哈", {i: 100});
+log.log("哈哈哈哈", {s:"sdf"});
+log.warn("哈哈哈哈", {date: new Date()});
+log.error("哈哈哈哈");
+
+function fff() {
+  this.aaa = 100;
+}
+
+
+
+var n = { n: null, u: undefined };
+
+log.warn(n);
+log.error(new fff());
+
+log.log(new Error("asdfasdf"));
+
+window.log = log;
+const Object_getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+
+function test(obj) {
+  obj.abcdn = 100;
+  obj.abcds = "200";
+  obj.abcdb = true;
+
+  log_area.innerText += `====${obj.constructor.name}====\n`;
+
+  if (obj.length !== undefined) {
+    log_area.innerText += `length = ${obj.length}\n`;
+  }
+  if (obj.byteLength !== undefined) {
+    log_area.innerText += `byteLength = ${obj.byteLength}\n`;
+  }
+
+  for (var p in obj) {
+    var desc = Object_getOwnPropertyDescriptor(obj, p);
+
+    log_area.innerText += `${p}: (${typeof obj[p]}) ${obj[p]}, {writable: ${desc.writable}, enumerable: ${desc.enumerable}, configurable: ${desc.configurable}}\n`
+  }
+
+  log.log(obj);
+}
+
+function newSet(t) {
+  var s = new t();
+  s.add({});
+  return s;
+}
+
+function newMap(t) {
+  var s = new t();
+  s.set({}, 'value associated with keyObj');
+  return s;
+}
+
+function newArray(t, l) {
+  var a = new t(l);
+  for (var i = 0; i < l; ++i) {
+    a[i] = i + 1;
+  }
+  return a;
+}
+
+function tests() {
+  log_area.innerText += `${Date.now()}\n`
+  test(new String("st"));
+  test(new Number(1000));
+  test(new Boolean(true));
+
+  test(new Error("e"));
+  test(new EvalError("ee"));
+  //test(new InternalError("ie"));
+  test(new RangeError("re"));
+  test(new ReferenceError("rfe"));
+  test(new SyntaxError("se"));
+  test(new TypeError("te"));
+  test(new URIError("te"));
+  //test(new Warning("wa"));
+
+  test(new Date());
+  test(new RegExp("wa"));
+
+  test([1, "2", true]);
+
+  test(new ArrayBuffer(10));
+
+  test(newArray(Int8Array, 10));
+  test(newArray(Uint8Array, 10));
+  test(newArray(Uint8ClampedArray, 10));
+  test(newArray(Int16Array, 10));
+  test(newArray(Uint16Array, 10));
+  test(newArray(Int32Array, 10));
+  test(newArray(Uint32Array, 10));
+  test(newArray(Float32Array, 10));
+  test(newArray(Float64Array, 10));
+
+  test(new DataView(new ArrayBuffer(10)));
+
+  test(new Set([1, 2, 3, 4, 5]));
+  test(newSet(WeakSet));
+
+  test(newMap(Map));
+  test(newMap(WeakMap));
+  log_area.innerText += `${Date.now()}\n`
+}
+
+tests();
 
 </script>
-
 </body>
 </html>
 

@@ -27,33 +27,45 @@ function encodeValue(ctx, v) {
       // Symbol.for(v)
       return { t: TypeIds.Symbol, v: Symbol.keyFor(v) };
     default:
-      return { t: TypeIds.Unknown, v: t.toString() };
+      return { t: TypeIds.Unknown, v: v.toString() };
   }
 };
 
-// return true if skip next process
+const Object_getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+
+// return true if already fully handled, to skip next process
 function encodeObjDetail(obj, o) {
   if (obj instanceof String) {
     o.t = ObjIds.String;
-    o.k = String(obj);
+    o.v = String(obj);
+    for (var p in obj) {
+      var desc = Object_getOwnPropertyDescriptor(obj, p);
+      if (desc.writable) {
+        o.p[p] = obj[p];
+      }
+    }
+    return true;
   } else if (obj instanceof Number) {
     o.t = ObjIds.Number;
-    o.k = Number(obj);
+    o.v = Number(obj);
   } else if (obj instanceof Boolean) {
     o.t = ObjIds.Boolean;
-    o.k = Boolean(obj);
+    o.v = Boolean(obj);
   } else if (obj instanceof Error) {
     o.t = ObjIds.Error;
-    o.k = obj.toString();
+    o.n = obj.constructor.name;
+    //o.v = obj.toString();
     o.m = obj.message;
     o.s = obj.stack;
   } else if (obj instanceof Date) {
     o.t = ObjIds.Date;
-    o.k = obj.getTime();
+    o.v = obj.getTime();
   } else if (obj instanceof RegExp) {
     o.t = ObjIds.RegExp;
-    o.k = obj.toString();
+    o.s = obj.source;
+    o.f = obj.flags;
   } else if (Array.isArray(obj)) {
+    o.t = ObjIds.Array;
     o.l = obj.length;
     return false;
   } else if (obj instanceof ArrayBuffer) {
@@ -62,10 +74,8 @@ function encodeObjDetail(obj, o) {
   } else if (ArrayBuffer.isView(obj)) {
     if (obj instanceof Int8Array) {
       o.t = ObjIds.Int8Array;
-
     } else if (obj instanceof Uint8Array) {
       o.t = ObjIds.Uint8Array;
-
     } else if (obj instanceof Uint8ClampedArray) {
       o.t = ObjIds.Uint8ClampedArray;
     } else if (obj instanceof Int16Array) {
@@ -82,22 +92,27 @@ function encodeObjDetail(obj, o) {
       o.t = ObjIds.Float64Array;
     } else if (obj instanceof DataView) {
       o.t = ObjIds.DataView;
+      return false;
     }
+    o.l = obj.length;
+    return false;
   } else if (obj instanceof Set) {
     o.t = ObjIds.Set;
-    o.k = obj.size;
+    o.s = obj.size;
   } else if (obj instanceof Map) {
     o.t = ObjIds.Map;
-    o.k = obj.size;
+    o.s = obj.size;
   } else if (obj instanceof WeakSet) {
     o.t = ObjIds.WeakSet;
   } else if (obj instanceof WeakMap) {
     o.t = ObjIds.WeakMap;
   } else {
-    o.n = obj.constructor.name;
+    if (obj.constructor && obj.constructor.name !== undefined && obj.constructor.name !== 'Object') {
+      o.n = obj.constructor.name;
+    }
     return false;
   }
-  return true;
+  return false;
 }
 
 function encodeObject(ctx, obj) {
@@ -118,7 +133,7 @@ function encodeObject(ctx, obj) {
   }
   id = { t: TypeIds.Object, v: ctx.o.length };
   const v = {};
-  const o = {v : v};
+  const o = {p : v};
   ctx.o.push(o);
   ctx._objmap.set(obj, id);
 

@@ -5,6 +5,9 @@
 // Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array, DataView
 // Set, Map, WeakSet, WeakMap
 
+//const global = window ? window : (global ? global : (GameGlobal ? GameGlobal : {}));
+const global = window;
+
 export const TypeIds = {
   Unknown: -1,
   Undefined: 0,
@@ -83,78 +86,103 @@ function decodeValue(ctx, v) {
   }
 }
 
+function objWithClass(n) {
+  var con = eval('(function() { return function ' + n + '() {} })()');
+  return new con();
+}
+
 function decodeObject(ctx, i, obj) {
   var o;
   switch (obj.t) {
     case ObjIds.Boolean:
-      o = new Boolean(obj.k);
+      o = new Boolean(obj.v);
       break;
     case ObjIds.Number:
-      o = new Number(obj.k);
+      o = new Number(obj.v);
       break;
     case ObjIds.String:
-      o = new String(obj.k);
+      o = new String(obj.v);
       break;
     case ObjIds.Date:
-      o = new Date(obj.k);
+      o = new Date(obj.v);
       break;
     case ObjIds.RegExp:
-      o = RegExp ? new RegExp(obj.k) : 'RegExp(' + obj.k + ')';
+      o = new RegExp(obj.s, obj.f);
+      break;
 
     case ObjIds.Array:
-      o = [];
+      o = new Array(obj.l);
       break;
 
     case ObjIds.Set:
-      o = new Set();
+      o = Set ? new Set() : 'Set()';
       break;
     case ObjIds.Map:
-      o = new Map();
+      o = Map ? new Map() : 'Map()';
       break;
     case ObjIds.WeakSet:
-      o = new WeakSet();
+      o = WeakSet ? new WeakSet() : 'WeakSet()';
       break;
     case ObjIds.WeakMap:
-      o = new WeakMap();
+      o = WeakMap ? new WeakMap() : 'WeakMap()';
       break;
 
     case ObjIds.Error:
-      o = obj.s;
+      if (obj.n && global[obj.n]) {
+        o = new global[obj.n](obj.m);
+        o.stack = obj.s;
+      } else {
+        o = obj.s;
+      }
       break;
 
     case ObjIds.ArrayBuffer:
-      o = new ArrayBuffer(1);
+      o = new ArrayBuffer(obj.l);
       break;
     case ObjIds.Int8Array:
+      o = new Int8Array(obj.l);
       break;
     case ObjIds.Uint8Array:
+      o = new Uint8Array(obj.l);
       break;
     case ObjIds.Uint8ClampedArray:
+      o = new Uint8ClampedArray(obj.l);
       break;
     case ObjIds.Int16Array:
+      o = new Int16Array(obj.l);
       break;
     case ObjIds.Uint16Array:
+      o = new Uint16Array(obj.l);
       break;
     case ObjIds.Int32Array:
+       o = new Int32Array(obj.l);
       break;
     case ObjIds.Uint32Array:
+      o = new Uint32Array(obj.l);
       break;
     case ObjIds.Float32Array:
+      o = new Float32Array(obj.l);
       break;
     case ObjIds.Float64Array:
+      o = new Float64Array(obj.l);
       break;
     case ObjIds.DataView:
+      o = DataView ? new DataView(new ArrayBuffer(4)) : 'DataView()';
       break;
 
     default:
-      o = {};
+      if (obj.n !== undefined) {
+        o = objWithClass(obj.n);
+      } else {
+        o = {};
+      }
       break;
   }
   ctx.o[i] = o;
   if (typeof o !== 'object') {
     return o;
   }
-  var v = obj.v;
+  var v = obj.p;
   for (var p in v) {
     o[p] = decodeValue(ctx, v[p]);
   }

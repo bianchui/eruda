@@ -406,8 +406,8 @@ function substituteStr(args) {
 
 function formatObj(val) {
   let type = getObjType(val)
-  if (type === 'Array' && val.length > 1) type = `(${val.length})`
-  if (type === 'Error' || type === 'Object') return `${getAbstract(val)}`
+  if (type === 'Array' && val.length > 1) type = `(${val.length})`;
+  if (type === 'Object' || val instanceof Error) return `${getAbstract(val)}`;
 
   return `${type} ${getAbstract(val)}`
 }
