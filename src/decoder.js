@@ -183,8 +183,10 @@ function decodeObject(ctx, i, obj) {
     return o;
   }
   var v = obj.p;
-  for (var p in v) {
-    o[p] = decodeValue(ctx, v[p]);
+  if (v) {
+    for (var p in v) {
+      o[p] = decodeValue(ctx, v[p]);
+    }
   }
   return o;
 }

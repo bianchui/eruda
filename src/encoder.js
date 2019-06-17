@@ -41,6 +41,9 @@ function encodeObjDetail(obj, o) {
     for (var p in obj) {
       var desc = Object_getOwnPropertyDescriptor(obj, p);
       if (desc.writable) {
+        if (!o.p) {
+          o.p = {};
+        }
         o.p[p] = obj[p];
       }
     }
@@ -132,13 +135,16 @@ function encodeObject(ctx, obj) {
     return -1;
   }
   id = { t: TypeIds.Object, v: ctx.o.length };
-  const v = {};
-  const o = {p : v};
+  const o = {};
   ctx.o.push(o);
   ctx._objmap.set(obj, id);
 
   if (!encodeObjDetail(obj, o)) {
+    let v = o.p;
     for (var p in obj) {
+      if (!v) {
+        v = o.p = {};
+      }
       v[p] = encodeValue(ctx, obj[p]);
     }
   }
