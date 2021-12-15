@@ -30,6 +30,8 @@ import {
   nextTick,
   //last
 } from './lib/util'
+import { Object_assign } from './jslib'
+
 
 module.exports = {
   init({ container, tool, autoScale = true, useShadowDom = true } = {}) {
@@ -176,7 +178,7 @@ module.exports = {
       }
     }
 
-    Object.assign(el, {
+    Object_assign(el, {
       id: 'eruda',
       className: 'eruda-container',
       contentEditable: false

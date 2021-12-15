@@ -5,6 +5,7 @@ import emitter from '../lib/emitter'
 import Settings from '../Settings/Settings'
 //import stringify from './stringify'
 import libStringify from '../lib/stringify'
+import { Object_assign } from '../jslib'
 
 export default class Console extends Tool {
   constructor() {
@@ -110,7 +111,7 @@ export default class Console extends Tool {
       _$input = _$inputContainer.find('textarea'),
       _$inputBtns = _$inputContainer.find('.eruda-buttons')
 
-    Object.assign(this, {
+    Object_assign(this, {
       _$control: $el.find('.eruda-control'),
       _$logs: $el.find('.eruda-logs'),
       _$inputContainer,
